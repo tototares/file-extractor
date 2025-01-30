@@ -7,9 +7,9 @@ deploy_to_railway:
   before_script:
     - pip install --upgrade pip
     - pip install railway --break-system-packages  # Installiere Railway CLI
-    - export PATH="/usr/local/bin:$PATH"  # Füge globalen Pfad hinzu
-    - railway login --api-token $RAILWAY_API_TOKEN  # Sicheres Login mit Token
+    - pip install railway --break-system-packages
+    - python -m railway login --api-token $RAILWAY_API_TOKEN
   script:
-    - railway up --service file-extractor  # Service deployen
+    - python -m railway up --service file-extractor
   only:
     - main
