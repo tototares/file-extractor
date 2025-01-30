@@ -1,5 +1,3 @@
-Flask
-pymupdf4llm
-pymupdf
 pymupdfpro
-fitz
+pymupdf4llm
+flask
