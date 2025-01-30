@@ -1,4 +1,5 @@
 Flask
 pymupdf4llm
+pymupdf
 pymupdfpro
 fitz
