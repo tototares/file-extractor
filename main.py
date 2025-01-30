@@ -3,13 +3,18 @@ import pymupdf4llm
 import pymupdf.pro
 import fitz  # PyMuPDF
 import io
+import os  # Für Zugriff auf Umgebungsvariablen
 
 app = Flask(__name__)
 
 @app.route('/convert', methods=['POST'])
 def convert_to_markdown():
-    # Unlock the pymupdf pro license
-    pymupdf.pro.unlock('7z5cjGSb3UYwgQxgAxgXZPic')
+    # Unlock the pymupdf pro license mit Umgebungsvariable
+    license_key = os.getenv("PYMUPDF_LICENSE")
+    if not license_key:
+        return jsonify({"error": "Missing PyMuPDF Pro License"}), 500
+
+    pymupdf.pro.unlock(license_key)
 
     # Get the uploaded file from the request
     uploaded_file = request.files['file']
