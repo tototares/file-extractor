@@ -3,14 +3,19 @@ stages:
 
 deploy_to_railway:
   stage: deploy
-  image: python:3.12
+  image: python:3.12  # Beibehaltung des Python-Images
   variables:
-    RAILWAY_TOKEN: $RAILWAY_API_TOKEN  # Setze die Umgebungsvariable für das Railway-Token
+    RAILWAY_TOKEN: $RAILWAY_API_TOKEN  # Sicherstellen, dass das Token gesetzt ist
+  before_script:
+    - apt-get update && apt-get install -y curl  # Installiere curl, falls nicht vorhanden
+    - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -  # Node.js 20 installieren
+    - apt-get install -y nodejs  # Node.js installieren
+    - npm i -g @railway/cli  # Railway CLI mit npm installieren
   script:
     - python -m venv venv
     - source venv/bin/activate
-    - pip install railway
-    - railway login --browserless
-    - railway up --service file-extractor  # Führe den Deployment-Befehl aus
+    - pip install --upgrade pip  # Sicherheitshalber neueste pip-Version installieren
+    - echo "Railway CLI Version:" $(railway --version)  # Prüfen, ob Railway installiert wurde
+    - railway up --service file-extractor  # Führe das Deployment durch
   only:
     - main
