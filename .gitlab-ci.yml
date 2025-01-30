@@ -4,12 +4,13 @@ stages:
 deploy_to_railway:
   stage: deploy
   image: python:3.12
+  variables:
+    RAILWAY_TOKEN: $RAILWAY_API_TOKEN  # Setze die Umgebungsvariable für das Railway-Token
   before_script:
     - python -m venv venv
     - source venv/bin/activate
     - pip install railway
-    - railway login --api-token $RAILWAY_API_TOKEN
   script:
-    - railway up --service file-extractor 
+    - railway up --service file-extractor  # Führe den Deployment-Befehl aus
   only:
     - main
