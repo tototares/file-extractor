@@ -5,7 +5,7 @@ deploy_to_railway:
   stage: deploy
   image: python:3.12  # Beibehaltung des Python-Images
   variables:
-    RAILWAY_TOKEN: $RAILWAY_API_TOKEN  # Sicherstellen, dass das Token gesetzt ist
+    RAILWAY_API_TOKEN: $RAILWAY_API_TOKEN  # Sicherstellen, dass das Token gesetzt ist
   before_script:
     - apt-get update && apt-get install -y curl  # Installiere curl, falls nicht vorhanden
     - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -  # Node.js 20 installieren
