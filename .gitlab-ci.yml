@@ -3,11 +3,12 @@ stages:
 
 deploy_to_railway:
   stage: deploy
-  image: python:3.12  # Verwende eine passende Python-Version
+  image: python:3.12
   before_script:
-    - pip install railway  # Railway CLI installieren
+    - pip install --user railway  # Installiere Railway CLI in ~/.local/bin
+    - export PATH="$HOME/.local/bin:$PATH"  # Füge es zum PATH hinzu
     - railway login --api-token $RAILWAY_API_TOKEN  # Sicheres Login mit Token
   script:
     - railway up --service file-extractor  # Service deployen
   only:
-    - main  # Nur auf dem main-Branch ausführen
+    - main
