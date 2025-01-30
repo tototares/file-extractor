@@ -5,12 +5,12 @@ deploy_to_railway:
   stage: deploy
   image: python:3.12
   variables:
-    RAILWAY_TOKEN: $RAILWAY_API_TOKEN  # Sicherstellen, dass das Token gesetzt ist
+    RAILWAY_TOKEN: $RAILWAY_API_TOKEN
   before_script:
-    - pip install --break-system-packages railway  # Globale Installation
+    - pip install --break-system-packages railway
   script:
-    - echo "Railway Token: ${RAILWAY_TOKEN:0:5}****"  # Debugging
-    - which railway  # Prüfen, wo railway installiert ist
-    - RAILWAY_DEBUG=1 railway up --service file-extractor  # Debug-Modus für bessere Logs
+    - echo "Railway Token: ${RAILWAY_TOKEN:0:5}****"
+    - which railway
+    - RAILWAY_DEBUG=1 railway up --service file-extractor
   only:
     - main
