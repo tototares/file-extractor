@@ -24,11 +24,10 @@ def convert_to_markdown():
         return jsonify({"error": "Missing PyMuPDF Pro License"}), 500
     pymupdf.pro.unlock(license_key)
 
-    
     file_bytes = uploaded_file.read()
     doc = fitz.open(stream=io.BytesIO(file_bytes), filetype="pdf")
 
     return jsonify({"markdown": pymupdf4llm.to_markdown(doc)})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=443)
+    app.run(host='0.0.0.0', port=8080)
