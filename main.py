@@ -3,33 +3,32 @@ import pymupdf4llm
 import pymupdf.pro
 import fitz  # PyMuPDF
 import io
-import os  # Für Zugriff auf Umgebungsvariablen
+import os
 
 app = Flask(__name__)
 
-@app.route('/convert', methods=['POST'])
+@app.route('/extract', methods=['POST'])
 def convert_to_markdown():
-    # Unlock the pymupdf pro license mit Umgebungsvariable
+    correctAuthToken = os.getenv("AUTH_TOKEN")
+    providedAuthToken = request.headers.get('Authorization')
+    if not correctAuthToken or not providedAuthToken or correctAuthToken != providedAuthToken:
+        return jsonify({"error": "Auth token invalid"}), 403
+
+    uploaded_file = request.files['file']
+    if not uploaded_file:
+        return jsonify({"error": "Missing File"}), 400
+
+    # Unlock the pymupdf pro license
     license_key = os.getenv("PYMUPDF_LICENSE")
     if not license_key:
         return jsonify({"error": "Missing PyMuPDF Pro License"}), 500
-
     pymupdf.pro.unlock(license_key)
 
-    # Get the uploaded file from the request
-    uploaded_file = request.files['file']
-
-    # Read the file into memory
+    
     file_bytes = uploaded_file.read()
-
-    # Open the document using fitz (PyMuPDF) from a BytesIO stream
     doc = fitz.open(stream=io.BytesIO(file_bytes), filetype="pdf")
 
-    # Convert the document to markdown using pymupdf4llm
-    md_text = pymupdf4llm.to_markdown(doc)
-
-    # Return the markdown as a JSON response
-    return jsonify({"markdown": md_text})
+    return jsonify({"markdown": pymupdf4llm.to_markdown(doc)})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=443)
