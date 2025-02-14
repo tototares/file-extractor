@@ -1,9 +1,8 @@
 from flask import Flask, request, jsonify
-import pymupdf4llm
-import pymupdf.pro
-import fitz  # PyMuPDF
-import io
 import os
+import io
+from docling.document import Document
+from docling.io import extract_text_from_pdf
 
 app = Flask(__name__)
 
@@ -20,26 +19,20 @@ def convert_to_markdown():
     uploaded_file = request.files['file']
     if not uploaded_file:
         return jsonify({"error": "No file uploaded"}), 400
-    
-    # Unlock the pymupdf pro license
-    license_key = os.getenv("PYMUPDF_LICENSE")
-    if not license_key:
-        return jsonify({"error": "Missing PyMuPDF Pro License"}), 500
-    
-    pymupdf.pro.unlock(license_key)
 
     try:
         file_bytes = uploaded_file.read()
-        doc = fitz.open(stream=io.BytesIO(file_bytes), filetype="pdf")
-    except Exception as e:
-        return jsonify({"error": "Failed to load PDF", "details": str(e)}), 400
-    
-    try:
-        markdown = pymupdf4llm.to_markdown(doc)
+        text = extract_text_from_pdf(io.BytesIO(file_bytes))
+        doc = Document(text)
+        markdown = doc.to_markdown()
+        
+        if not markdown.strip():
+            return jsonify({"error": "Extracted markdown is empty"}), 400
+        
     except Exception as e:
         return jsonify({"error": "Failed to extract markdown", "details": str(e)}), 500
     
     return jsonify({"markdown": markdown})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8080, debug=True)
