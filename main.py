@@ -1,8 +1,7 @@
 from flask import Flask, request, jsonify
 import os
 import io
-from docling.document import Document
-from docling.io import extract_text_from_pdf
+from docling.document_converter import DocumentConverter
 
 app = Flask(__name__)
 
@@ -22,10 +21,17 @@ def convert_to_markdown():
 
     try:
         file_bytes = uploaded_file.read()
-        text = extract_text_from_pdf(io.BytesIO(file_bytes))
-        doc = Document(text)
-        markdown = doc.to_markdown()
-        
+        file_stream = io.BytesIO(file_bytes)  # Direkter Stream statt Speicherung
+
+        # Verwende DocumentConverter mit Memory-Stream
+        converter = DocumentConverter()
+        result = converter.convert(file_stream)
+
+        if not result or not result.document:
+            return jsonify({"error": "Failed to process document"}), 500
+
+        markdown = result.document.export_to_markdown()
+
         if not markdown.strip():
             return jsonify({"error": "Extracted markdown is empty"}), 400
         
