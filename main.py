@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import os
 import io
 from docling.document_converter import DocumentConverter
+from docling.datamodel.base_models import DocumentStream
 
 app = Flask(__name__)
 
@@ -14,14 +15,14 @@ def convert_to_markdown():
 
     if 'file' not in request.files:
         return jsonify({"error": "Missing File"}), 400
-    
+
     uploaded_file = request.files['file']
     if not uploaded_file:
         return jsonify({"error": "No file uploaded"}), 400
 
     try:
         file_bytes = uploaded_file.read()
-        file_stream = io.BytesIO(file_bytes)  # Direkter Stream statt Speicherung
+        file_stream = DocumentStream(name=uploaded_file.name, stream=io.BytesIO(file_bytes))  # Direkter Stream statt Speicherung
 
         # Verwende DocumentConverter mit Memory-Stream
         converter = DocumentConverter()
@@ -34,10 +35,10 @@ def convert_to_markdown():
 
         if not markdown.strip():
             return jsonify({"error": "Extracted markdown is empty"}), 400
-        
+
     except Exception as e:
         return jsonify({"error": "Failed to extract markdown", "details": str(e)}), 500
-    
+
     return jsonify({"markdown": markdown})
 
 if __name__ == '__main__':
